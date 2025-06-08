@@ -1,4 +1,5 @@
 python-telegram-bot==20.8
-openai==0.28
 fastapi
 uvicorn[standard]
+nest_asyncio
+openai>=1.0.0
