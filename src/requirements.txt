@@ -1,5 +1,0 @@
-python-telegram-bot==20.8
-openai
-nest_asyncio
-fastapi
-uvicorn[standard]

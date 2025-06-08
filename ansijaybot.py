@@ -3,17 +3,18 @@ from fastapi import FastAPI, Request
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
 import openai
-import nest_asyncio
-import asyncio
 
-# === CONFIGURAÇÕES MANUAIS ===
+if not os.getenv("RENDER"):  # Só aplica nest_asyncio fora do Render
+    import nest_asyncio
+    nest_asyncio.apply()
+
+# === CONFIGURAÇÕES ===
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-WEBHOOK_URL = "https://ansijaybot.onrender.com/"  # 👈 fixado aqui!
+WEBHOOK_URL = "https://ansijaybot.onrender.com/"
 
 # === INICIALIZAÇÕES ===
 openai.api_key = OPENAI_API_KEY
-nest_asyncio.apply()
 app = FastAPI()
 telegram_app = ApplicationBuilder().token(BOT_TOKEN).build()
 
@@ -53,12 +54,10 @@ async def webhook(request: Request):
     await telegram_app.process_update(update)
     return {"ok": True}
 
-# === STARTUP: REGISTRA O WEBHOOK NO TELEGRAM ===
+# === REGISTRO DO WEBHOOK ===
 @app.on_event("startup")
 async def startup():
     await telegram_app.initialize()
     await telegram_app.bot.set_webhook(url=WEBHOOK_URL)
     await telegram_app.start()
     print(f"🔔 Webhook configurado com sucesso: {WEBHOOK_URL}")
-    print("feito")
-
